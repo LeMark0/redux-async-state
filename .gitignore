@@ -1,0 +1,32 @@
+# IDE & editors
+
+.idea/
+.vscode/
+
+# OS specific
+
+.DS_Store
+
+# Testing
+
+.eslintrc_local
+coverage/
+
+# Other
+
+!node_modules/@bo
+**yarn-clean.log
+**yarn-debug.log
+**yarn-error.log
+*.local.yml
+*.log
+.DS_Store
+.env.local
+.history
+.out/
+/build/
+/coverage/
+node_modules
+npm-debug.log*
+report/
+tmp

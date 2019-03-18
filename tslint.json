@@ -1,0 +1,12 @@
+{
+  "extends": ["tslint-config-revolut-react"],
+  "rules": {
+    "no-increment-decrement": false,
+    "jsx-no-lambda": false,
+    "no-this-assignment": false,
+    "no-duplicate-imports": false
+  },
+  "linterOptions": {
+    "exclude": ["config/**/*.js", "node_modules/**/*.ts", "**/*.{js,jsx,mjs,json}"]
+  }
+}

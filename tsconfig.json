@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src/",
+    "rootDir": "src",
+    "downlevelIteration": true, // need this for enabling spread operator on new Set()
+    "outDir": "build/dist",
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "module": "esnext",
+    "target": "esnext",
+    "sourceMap": true,
+    "allowJs": true,
+    "esModuleInterop": false, // Figure out what it does to fix (recommended by CRA)
+    "isolatedModules": false, // Will set to true once all Namespace shit is removed
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": false,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "noUnusedParameters": true, // Use _ as name for unused parameter, it will be ignored then
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true, // please switch in off and fix your part then report back.
+    // So we can eventually have it off forever
+    "skipLibCheck": true,
+    // "strictFunctionTypes": true, // сonsider to switch it on and fix your parts
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": false,
+    "strict": false,
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
+      }
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests",
+    "webpack",
+    "jest",
+    "src/setupTests.ts",
+    "coverage",
+  ],
+  "include": ["src"]
+}
