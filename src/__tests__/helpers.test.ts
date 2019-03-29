@@ -174,10 +174,10 @@ const normalizedExampleStringKey = {
 }
 
 test('makeType', () => {
-  expect(makeType('GET_NOTES', actionTypes.request)).toBe('async/GET_NOTES/REQUEST')
-  expect(makeType('GET_NOTES', actionTypes.fail)).toBe('async/GET_NOTES/FAIL')
-  expect(makeType('', actionTypes.request)).toBe('async/REQUEST')
-  expect(makeType('', actionTypes.fail)).toBe('async/FAIL')
+  expect(makeType('GET_NOTES', actionTypes.Request)).toBe('async/GET_NOTES/REQUEST')
+  expect(makeType('GET_NOTES', actionTypes.Fail)).toBe('async/GET_NOTES/FAIL')
+  expect(makeType('', actionTypes.Request)).toBe('async/REQUEST')
+  expect(makeType('', actionTypes.Fail)).toBe('async/FAIL')
 })
 
 describe('getKey', () => {

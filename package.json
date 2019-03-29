@@ -4,7 +4,10 @@
   "main": "index.ts",
   "author": "Pavel Marianov",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@types/lodash": "^4.14.123",
+    "lodash": "^4.17.11"
+  },
   "scripts": {
     "test": "jest",
     "type-check": "tsc --noEmit",

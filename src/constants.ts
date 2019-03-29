@@ -2,9 +2,9 @@ export const actionTypePrefix = 'async'
 export const defaultPath = 'async'
 
 export enum actionTypes {
-  request = 'REQUEST',
-  success = 'SUCCESS',
-  fail = 'FAIL',
+  Request = 'REQUEST',
+  Success = 'SUCCESS',
+  Fail = 'FAIL',
 }
 
 export const normalizedInitial = { ids: [], data: {}, denormalized: [] }

@@ -1,29 +1,27 @@
-import { AsyncError } from './types'
+import { AsyncError, Normalized } from './types'
 import { normalizedInitial } from './constants'
 
-export type AsyncStateResult<T> = {
-  ids: string[]
-  data: { [key: string]: T[] }
-  denormalized: T[]
-}
+// TODO replace by normalised type
+// export type AsyncStateResult<T> = {
+//   ids: string[]
+//   data: { [key: string]: T[] }
+//   denormalized: T[]
+// }
 
 export class AsyncState<T> {
-  constructor(
-    keys: string[] = [],
-    initialResult: AsyncStateResult<T> = normalizedInitial,
-  ) {
+  constructor(keys: string[] = [], initialResult: Normalized<T> = normalizedInitial) {
     this.result = keys.reduce(
       (result, key) =>
         ({
           ...result,
           [key]: {},
-        } as AsyncStateResult<T>),
+        } as Normalized<T>),
       initialResult,
     )
   }
-  result: AsyncStateResult<T>
+  result: Normalized<T>
   isFetching: boolean = false
   isSuccess: boolean = false
   error?: AsyncError
-  rawResponse: T
+  rawResponse?: T | T[]
 }
