@@ -1,6 +1,6 @@
 import { setResult } from '../reducers'
 import { AsyncState } from '../AsyncState'
-import { defaultTransformer } from '../index'
+import { defaultTransformer } from '../transformers'
 
 const list = [
   {

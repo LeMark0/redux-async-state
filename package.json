@@ -5,8 +5,8 @@
   "author": "Pavel Marianov",
   "license": "MIT",
   "dependencies": {
-    "@types/lodash": "^4.14.123",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
     "test": "jest",
@@ -24,6 +24,7 @@
     "@babel/preset-env": "7.2.0",
     "@babel/preset-typescript": "7.1.0",
     "@types/jest": "^24.0.9",
+    "@types/lodash": "^4.14.123",
     "jest": "^24.1.0",
     "prettier": "^1.16.4",
     "tslint-config-revolut-react": "^0.0.10",
