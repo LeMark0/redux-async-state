@@ -1,6 +1,6 @@
 import {
   State,
-  AsyncAction,
+  AsyncActionWithDefaults,
   Action,
   Reducer,
   TransformFunction,
@@ -43,7 +43,7 @@ type SetResultParams<T> = {
   action: Action
   asyncState: AsyncState<T>
   transform: TransformFunction
-  transformParams: TransformParams
+  transformParams?: TransformParams
 }
 export function setResult<T>({
   action,
@@ -72,23 +72,6 @@ export function setResult<T>({
     },
   }
 }
-// type SetResultParams<T> = {
-//   asyncState: AsyncState<T>
-//   action: SuccessAction
-// }
-// export function setResult<T>({ asyncState, action }: SetResultParams<T>): AsyncState<T> {
-//   const { transformedData, data } = action.payload
-//
-//   return {
-//     ...asyncState,
-//     error: undefined,
-//     rawResponse: data,
-//     result: {
-//       ...asyncState.result,
-//       ...transformedData,
-//     },
-//   }
-// }
 
 /**
  * Apply request reducer to asyncState with current action
@@ -115,7 +98,7 @@ function getNextState<T>(state: State, action: Action, reducer: Reducer<T>): Sta
  */
 function prepareStateRequest<T>(
   asyncState = new AsyncState<T>(),
-  action: AsyncAction,
+  action: AsyncActionWithDefaults,
 ): AsyncState<T> {
   const {
     payload: { transform, transformParams },
@@ -130,28 +113,13 @@ function prepareStateRequest<T>(
       : asyncState.result,
   }
 }
-// function prepareStateRequest<T>(
-//   asyncState = new AsyncState<T>(),
-//   action: RequestAction,
-// ): AsyncState<T> {
-//   const {
-//     payload: { initialResult },
-//   } = action
-//
-//   return {
-//     ...setIsFetching<T>(asyncState, true),
-//     isSuccess: false,
-//     // keep previous data if it exists or create initial asyncState
-//     result: isEmpty(asyncState.result) ? initialResult : asyncState.result,
-//   }
-// }
 
 /**
  * Create new AsyncState with given result
  */
 function prepareStateSuccess<T>(
   asyncState: AsyncState<T>,
-  action: Action,
+  action: AsyncActionWithDefaults,
 ): AsyncState<T> {
   const { isAction, transform, transformParams } = action.payload
   if (isAction) {
@@ -164,43 +132,11 @@ function prepareStateSuccess<T>(
     transformParams,
   })
 }
-//
-// export type SuccessActionPayload = {
-//   isAction?: boolean
-//   data: any
-//   transformedData: any
-// }
-// export type SuccessAction = Action & {
-//   payload: SuccessActionPayload
-// }
-//
-// function prepareStateSuccess<T>(
-//   asyncState: AsyncState<T>,
-//   action: SuccessAction,
-// ): AsyncState<T> {
-//   const { isAction, data, transformedData } = action.payload
-//
-//   const asyncStateNotFetching = { ...setIsFetching(asyncState, false), isSuccess: true }
-//
-//   if (isAction) {
-//     return asyncStateNotFetching
-//   }
-//
-//   return {
-//     ...asyncState,
-//     error: undefined,
-//     rawResponse: data,
-//     result: {
-//       ...asyncState.result,
-//       ...transformedData,
-//     },
-//   }
-// }
 
 /**
  * Create new AsyncState when request is failed
  */
-type FailAction = Action & {
+type FailAction = AsyncActionWithDefaults & {
   payload: {
     error: any
     transformError: TransformErrorFunction

@@ -1,44 +1,7 @@
 import { Dispatch } from 'redux'
-import { AsyncAction, Request, Success, Fail, Action, ApiResponse } from './types'
+import { Request, Success, Fail, Action, ApiResponse } from './types'
 import { makeType } from './helpers'
 import { actionTypes, defaultPath } from './constants'
-import { defaultTransformer, transformAxiosError } from './transformers'
-
-type RequestActionPayload = {
-  path?: string
-  actionType?: string
-  isAction?: boolean
-}
-type RequestAction = Action & {
-  payload: RequestActionPayload
-}
-
-// export const request = ({
-//   resource,
-//   params = {},
-//   path,
-//   actionType = '',
-//   isAction = false,
-//   onSuccessAction,
-//   onErrorAction,
-//   onSuccess,
-//   onError,
-//   transform = defaultTransformer,
-// }: Request): AsyncAction => ({
-//   type: makeType(actionType, actionTypes.Request),
-//   payload: {
-//     resource,
-//     params,
-//     path,
-//     actionType,
-//     isAction,
-//     onSuccessAction,
-//     onErrorAction,
-//     onSuccess,
-//     onError,
-//     transform,
-//   },
-// })
 
 export const request = ({
   path,
@@ -93,7 +56,6 @@ export const fail = <T = any>({
   },
 })
 
-// TODO: set defaults
 export const asyncRequest = ({
   params = {},
   isAction = false,
@@ -101,8 +63,6 @@ export const asyncRequest = ({
   ...rest
 }: Request) => async (dispatch: Dispatch) => {
   const requestParams = { params, isAction, actionType, ...rest }
-
-  console.log('asyncRequest.requestParams: ', requestParams)
 
   dispatch(request(requestParams))
   try {

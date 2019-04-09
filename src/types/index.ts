@@ -41,6 +41,10 @@ export type AsyncAction = {
   payload: Request
 }
 
+export type AsyncActionWithDefaults = AsyncAction & {
+  payload: RequestWithDefaults
+}
+
 export type Callback = (response: object) => void
 
 export type State = {
@@ -87,9 +91,13 @@ export type Request = {
   onError?: Callback | Callback[]
   /** Transform function for response */
   transform?: TransformFunction
-  /** TODO pass PARAMS? **/
   transformParams?: TransformParams
   transformError?: TransformErrorFunction
+}
+
+export type RequestWithDefaults = Request & {
+  transform: TransformFunction
+  transformError: TransformErrorFunction
 }
 
 export type Success<T> = {
@@ -113,12 +121,3 @@ export type ApiResponse = {
   data: any
 }
 
-export type RequestActionPayload = {
-  path?: string
-  actionType?: string
-  isAction?: boolean
-  initialResult: any
-}
-export type RequestAction = Action & {
-  payload: RequestActionPayload
-}
