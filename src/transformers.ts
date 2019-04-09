@@ -1,3 +1,5 @@
+import { get } from 'lodash'
+import { AxiosError } from 'axios'
 import { StateParams } from './types'
 import { addArrayToNormalizedList, normalizeList, setLinkedData } from './helpers'
 
@@ -25,3 +27,15 @@ export const defaultTransformer = (
     ? addArrayToNormalizedList(prevState.result, list, keyProp)
     : normalizeList(list, keyProp)
 }
+
+export type AsyncError = {
+  status?: number
+  statusText?: string
+  message?: string
+}
+
+export const transformAxiosError = (errorResponse: AxiosError): AsyncError => ({
+  status: get(errorResponse, 'response.status'),
+  statusText: get(errorResponse, 'response.statusText'),
+  message: get(errorResponse, 'response.data.message'),
+})

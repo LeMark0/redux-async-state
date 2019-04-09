@@ -34,6 +34,8 @@ export type TransformFunction = (
   transformParams?: TransformParams,
 ) => any
 
+export type TransformErrorFunction = (error: any) => any
+
 export type AsyncAction = {
   type: string
   payload: Request
@@ -63,7 +65,7 @@ export type AsyncError = {
 
 export type Request = {
   /** Api resource function */
-  resource: (...args: any[]) => void
+  resource: (...args: any[]) => Promise<any>
   /** Request params */
   params?: object
   /** Path in store where result must be saved */
@@ -72,6 +74,7 @@ export type Request = {
   actionType?: string
   /** If need to keep saved data, use it for POST, PATCH, PUT */
   isAction?: boolean
+  // isMutation
   // /** Action description for status message */
   // actionDesc?: string
   /** Success callback or array of callbacks */
@@ -83,9 +86,10 @@ export type Request = {
   /** Error callback */
   onError?: Callback | Callback[]
   /** Transform function for response */
-  transform: TransformFunction
+  transform?: TransformFunction
   /** TODO pass PARAMS? **/
   transformParams?: TransformParams
+  transformError?: TransformErrorFunction
 }
 
 export type Success<T> = {
@@ -93,7 +97,7 @@ export type Success<T> = {
   data?: T
   actionType: string
   isAction?: boolean
-  transform: TransformFunction
+  transform?: TransformFunction
   transformParams?: TransformParams
 }
 
@@ -101,4 +105,20 @@ export type Fail<T> = {
   path?: string
   actionType: string
   error?: T
+  transformError?: TransformErrorFunction
+}
+
+// TODO type better
+export type ApiResponse = {
+  data: any
+}
+
+export type RequestActionPayload = {
+  path?: string
+  actionType?: string
+  isAction?: boolean
+  initialResult: any
+}
+export type RequestAction = Action & {
+  payload: RequestActionPayload
 }

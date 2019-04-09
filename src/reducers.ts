@@ -5,18 +5,19 @@ import {
   Reducer,
   TransformFunction,
   TransformParams,
-  AsyncError,
+  TransformErrorFunction,
 } from './types'
-import { get, set, isEmpty } from 'lodash'
+import { get, set, isEmpty, merge } from 'lodash'
 import { AsyncState } from './AsyncState'
-import { actionTypePrefix, actionTypes } from './constants'
+import { actionTypePrefix, actionTypes, defaultPath } from './constants'
+import { defaultTransformer, transformAxiosError } from './transformers'
 
 /**
  * Collect async statuses to root domain
  */
 const collectAsyncStatus = (state: State, path: string, isFetching: boolean): State => ({
   ...state,
-  async: {
+  [defaultPath]: {
     ...state.async,
     [path]: {
       ...state.async[path],
@@ -71,6 +72,23 @@ export function setResult<T>({
     },
   }
 }
+// type SetResultParams<T> = {
+//   asyncState: AsyncState<T>
+//   action: SuccessAction
+// }
+// export function setResult<T>({ asyncState, action }: SetResultParams<T>): AsyncState<T> {
+//   const { transformedData, data } = action.payload
+//
+//   return {
+//     ...asyncState,
+//     error: undefined,
+//     rawResponse: data,
+//     result: {
+//       ...asyncState.result,
+//       ...transformedData,
+//     },
+//   }
+// }
 
 /**
  * Apply request reducer to asyncState with current action
@@ -112,6 +130,21 @@ function prepareStateRequest<T>(
       : asyncState.result,
   }
 }
+// function prepareStateRequest<T>(
+//   asyncState = new AsyncState<T>(),
+//   action: RequestAction,
+// ): AsyncState<T> {
+//   const {
+//     payload: { initialResult },
+//   } = action
+//
+//   return {
+//     ...setIsFetching<T>(asyncState, true),
+//     isSuccess: false,
+//     // keep previous data if it exists or create initial asyncState
+//     result: isEmpty(asyncState.result) ? initialResult : asyncState.result,
+//   }
+// }
 
 /**
  * Create new AsyncState with given result
@@ -131,40 +164,111 @@ function prepareStateSuccess<T>(
     transformParams,
   })
 }
+//
+// export type SuccessActionPayload = {
+//   isAction?: boolean
+//   data: any
+//   transformedData: any
+// }
+// export type SuccessAction = Action & {
+//   payload: SuccessActionPayload
+// }
+//
+// function prepareStateSuccess<T>(
+//   asyncState: AsyncState<T>,
+//   action: SuccessAction,
+// ): AsyncState<T> {
+//   const { isAction, data, transformedData } = action.payload
+//
+//   const asyncStateNotFetching = { ...setIsFetching(asyncState, false), isSuccess: true }
+//
+//   if (isAction) {
+//     return asyncStateNotFetching
+//   }
+//
+//   return {
+//     ...asyncState,
+//     error: undefined,
+//     rawResponse: data,
+//     result: {
+//       ...asyncState.result,
+//       ...transformedData,
+//     },
+//   }
+// }
 
 /**
  * Create new AsyncState when request is failed
  */
-function prepareStateFail<T>(state: AsyncState<T>, action: Action): AsyncState<T> {
-  const { error }: { error?: AsyncError } = action.payload
+type FailAction = Action & {
+  payload: {
+    error: any
+    transformError: TransformErrorFunction
+  }
+}
+function prepareStateFail<T>(state: AsyncState<T>, action: FailAction): AsyncState<T> {
+  const { error, transformError } = action.payload
+
+  const errorTransformed = transformError(error)
+
   return {
     ...setIsFetching(state, false),
     isFetching: false,
     isSuccess: false,
-    error,
+    error: errorTransformed,
   }
 }
 
-export const asyncReducer = (rootState: State, action: Action) => {
-  const matched = new RegExp(
-    `^${actionTypePrefix}\\/(.*)(${actionTypes.Success}|${actionTypes.Fail}|${
-      actionTypes.Request
-    })\\b`,
-    'g',
-  ).exec(action.type)
+const initialState = {
+  async: {},
+}
 
-  if (matched) {
-    const asyncActionType = matched[matched.length - 1]
+type Config = {
+  transform?: TransformFunction
+  transformError?: TransformErrorFunction
+}
 
-    switch (asyncActionType) {
-      case actionTypes.Request:
-        return getNextState(rootState, action, prepareStateRequest)
-      case actionTypes.Success:
-        return getNextState(rootState, action, prepareStateSuccess)
-      case actionTypes.Fail:
-        return getNextState(rootState, action, prepareStateFail)
-      default:
-        return rootState
+export const asyncReducer = (
+  rootState: State = initialState,
+  action: Action,
+  config?: Config,
+) => {
+  console.log('asyncReducer.rootState: ', rootState)
+  console.log('asyncReducer.action: ', action)
+
+  if (action) {
+    const matched = new RegExp(
+      `^${actionTypePrefix}\\/(.*)(${actionTypes.Success}|${actionTypes.Fail}|${
+        actionTypes.Request
+      })\\b`,
+      'g',
+    ).exec(action.type)
+
+    if (matched) {
+      const asyncActionType = matched[matched.length - 1]
+
+      const defaults = {
+        transform: get(config, 'transform', defaultTransformer),
+        transformError: get(config, 'transformError', transformAxiosError),
+      }
+
+      const actionWithDefaults = {
+        ...action,
+        payload: merge(defaults, action.payload)
+      }
+
+      console.log('actionWithDefaults: ', actionWithDefaults)
+
+      switch (asyncActionType) {
+        case actionTypes.Request:
+          return getNextState(rootState, actionWithDefaults, prepareStateRequest)
+        case actionTypes.Success:
+          return getNextState(rootState, actionWithDefaults, prepareStateSuccess)
+        case actionTypes.Fail:
+          return getNextState(rootState, actionWithDefaults, prepareStateFail)
+        default:
+          return rootState
+      }
     }
   }
 
