@@ -5,7 +5,7 @@ import {
   Reducer,
   TransformFunction,
   TransformParams,
-  TransformErrorFunction,
+  TransformErrorFunction, Callback,
 } from './types'
 import { get, set, isEmpty, merge } from 'lodash'
 import { AsyncState } from './AsyncState'
@@ -121,8 +121,8 @@ function prepareStateSuccess<T>(
   asyncState: AsyncState<T>,
   action: AsyncActionWithDefaults,
 ): AsyncState<T> {
-  const { isAction, transform, transformParams } = action.payload
-  if (isAction) {
+  const { isMutation, transform, transformParams } = action.payload
+  if (isMutation) {
     return { ...setIsFetching(asyncState, false), isSuccess: true }
   }
   return setResult({
@@ -159,19 +159,10 @@ const initialState = {
   async: {},
 }
 
-type Config = {
-  transform?: TransformFunction
-  transformError?: TransformErrorFunction
-}
-
 export const asyncReducer = (
   rootState: State = initialState,
-  action: Action,
-  config?: Config,
+  action: Action
 ) => {
-  console.log('asyncReducer.rootState: ', rootState)
-  console.log('asyncReducer.action: ', action)
-
   if (action) {
     const matched = new RegExp(
       `^${actionTypePrefix}\\/(.*)(${actionTypes.Success}|${actionTypes.Fail}|${
@@ -183,25 +174,13 @@ export const asyncReducer = (
     if (matched) {
       const asyncActionType = matched[matched.length - 1]
 
-      const defaults = {
-        transform: get(config, 'transform', defaultTransformer),
-        transformError: get(config, 'transformError', transformAxiosError),
-      }
-
-      const actionWithDefaults = {
-        ...action,
-        payload: merge(defaults, action.payload)
-      }
-
-      console.log('actionWithDefaults: ', actionWithDefaults)
-
       switch (asyncActionType) {
         case actionTypes.Request:
-          return getNextState(rootState, actionWithDefaults, prepareStateRequest)
+          return getNextState(rootState, action, prepareStateRequest)
         case actionTypes.Success:
-          return getNextState(rootState, actionWithDefaults, prepareStateSuccess)
+          return getNextState(rootState, action, prepareStateSuccess)
         case actionTypes.Fail:
-          return getNextState(rootState, actionWithDefaults, prepareStateFail)
+          return getNextState(rootState, action, prepareStateFail)
         default:
           return rootState
       }

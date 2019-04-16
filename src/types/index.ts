@@ -45,7 +45,8 @@ export type AsyncActionWithDefaults = AsyncAction & {
   payload: RequestWithDefaults
 }
 
-export type Callback = (response: object) => void
+export type Callback = (response: object, action: Action) => any
+export type CallbackAction = (response: any, action: Action) => any
 
 export type State = {
   async: object
@@ -76,25 +77,26 @@ export type Request = {
   path?: string
   /** type property of redux action **/
   actionType?: string
-  /** If need to keep saved data, use it for POST, PATCH, PUT */
-  isAction?: boolean
+  // /** If need to keep saved data, use it for POST, PATCH, PUT */
+  isMutation?: boolean
   // isMutation
   // /** Action description for status message */
   // actionDesc?: string
   /** Success callback or array of callbacks */
-  onSuccessAction?: Callback | Callback[]
+  onSuccessAction?: CallbackAction | CallbackAction[]
   /** Error callback or array of callbacks */
-  onErrorAction?: Callback | Callback[]
+  onErrorAction?: CallbackAction | CallbackAction[]
   /** Success callback */
-  onSuccess?: Callback | Callback[]
+  onSuccess?: Callback
   /** Error callback */
-  onError?: Callback | Callback[]
+  onError?: Callback
   /** Transform function for response */
   transform?: TransformFunction
   transformParams?: TransformParams
   transformError?: TransformErrorFunction
 }
 
+// TODO del?
 export type RequestWithDefaults = Request & {
   transform: TransformFunction
   transformError: TransformErrorFunction
@@ -103,16 +105,17 @@ export type RequestWithDefaults = Request & {
 export type Success<T> = {
   path?: string
   data?: T
-  actionType: string
-  isAction?: boolean
+  actionType?: string
+  isMutation?: boolean
   transform?: TransformFunction
   transformParams?: TransformParams
 }
 
 export type Fail<T> = {
   path?: string
-  actionType: string
   error?: T
+  actionType?: string
+  isMutation?: boolean
   transformError?: TransformErrorFunction
 }
 
